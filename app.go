@@ -12,8 +12,13 @@ import (
 func registerHandlers() {
 	router := mux.NewRouter()
 
-	customerRepository := domain.NewCustomerRepositoryStub()
-	customerService := service.NewCustomerService(customerRepository)
+	// This is the stubbed repository which would give hard coded response
+	// customerRepositoryStub := domain.NewCustomerRepositoryStub()
+
+	// This is the Actual Adapter and would return the data from the DB
+	customerRepositoryDb := domain.NewCustomerRepositoryDb()
+
+	customerService := service.NewCustomerService(customerRepositoryDb)
 
 	routerHandler := RouterHandler{service: customerService}
 

@@ -2,10 +2,12 @@ package service
 
 import "banking/domain"
 
+// This is the primary port of our hexagonal architecture.
 type CustomerService interface {
 	GetAllCustomers() ([]domain.Customer, error)
 }
 
+// Adapter for the primary port
 type DefaultCustomerService struct {
 	repo domain.CustomerRepository
 }

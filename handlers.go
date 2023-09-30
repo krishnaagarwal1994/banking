@@ -20,12 +20,7 @@ func greet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (routerHandler *RouterHandler) getAllCustomer(w http.ResponseWriter, r *http.Request) {
-	// return routerHandler.service.FindAll()
-	customers := []domain.Customer{
-		{Id: "1", Name: "Krishna", City: "Gwalior", Zipcode: "474006"},
-		{Id: "2", Name: "Madhur", City: "Morena", Zipcode: "474001"},
-	}
-
+	customers, _ := routerHandler.service.GetAllCustomers()
 	contentType := r.Header.Get("Content-Type")
 	if contentType == "application/xml" {
 		w.Header().Add("Content-Type", "application/xml")
@@ -44,9 +39,9 @@ func (routerHandler *RouterHandler) getCustomer(w http.ResponseWriter, r *http.R
 	fmt.Print(customer_id)
 	var customer domain.Customer
 	if customer_id == "1" {
-		customer = domain.Customer{Id: "1", Name: "Krishna", City: "Gwalior", Zipcode: "474006"}
+		customer = domain.Customer{Id: "1", Name: "Krishna", City: "Gwalior", Zipcode: "474006", DateOfBirth: "31-08-1994", Status: "single"}
 	} else {
-		customer = domain.Customer{Id: "2", Name: "Madhur", City: "Morena", Zipcode: "474001"}
+		customer = domain.Customer{Id: "2", Name: "Madhur", City: "Morena", Zipcode: "474001", DateOfBirth: "21-11-1994", Status: "Single"}
 	}
 	w.Header().Add("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(customer)
