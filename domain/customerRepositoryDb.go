@@ -2,6 +2,7 @@ package domain
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 	"time"
 
@@ -33,6 +34,22 @@ func (repository CustomerRepositoryDb) FindAll() ([]Customer, error) {
 		customers = append(customers, c)
 	}
 	return customers, nil
+}
+
+func (repository CustomerRepositoryDb) Find(customerID string) (*Customer, error) {
+	if customerID == "" {
+		return nil, errors.New("Customer id is empty")
+	}
+	findCustomerQuery := "select customer_id, name, city, zipcode, date_of_birth, status from customers where customer_id = ?"
+
+	row := repository.client.QueryRow(findCustomerQuery, customerID)
+	var c Customer
+	err := row.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateOfBirth, &c.Status)
+	if err != nil {
+		log.Print("Error occured while scanning the customer id " + customerID)
+		return nil, err
+	}
+	return &c, nil
 }
 
 func NewCustomerRepositoryDb() CustomerRepositoryDb {

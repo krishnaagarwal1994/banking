@@ -1,7 +1,6 @@
 package main
 
 import (
-	"banking/domain"
 	"banking/service"
 	"encoding/json"
 	"encoding/xml"
@@ -36,13 +35,7 @@ func (routerHandler *RouterHandler) getAllCustomer(w http.ResponseWriter, r *htt
 func (routerHandler *RouterHandler) getCustomer(w http.ResponseWriter, r *http.Request) {
 	requestVars := mux.Vars(r)
 	customer_id := requestVars["customer_id"]
-	fmt.Print(customer_id)
-	var customer domain.Customer
-	if customer_id == "1" {
-		customer = domain.Customer{Id: "1", Name: "Krishna", City: "Gwalior", Zipcode: "474006", DateOfBirth: "31-08-1994", Status: "single"}
-	} else {
-		customer = domain.Customer{Id: "2", Name: "Madhur", City: "Morena", Zipcode: "474001", DateOfBirth: "21-11-1994", Status: "Single"}
-	}
+	customer, _ := routerHandler.service.GetCustomerWith(customer_id)
 	w.Header().Add("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(customer)
 }

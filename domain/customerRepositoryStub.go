@@ -9,6 +9,10 @@ func (c CustomerRepositoryStub) FindAll() ([]Customer, error) {
 	return c.customers, nil
 }
 
+func (c CustomerRepositoryStub) Find(customerID string) (*Customer, error) {
+	return &c.customers[0], nil
+}
+
 func NewCustomerRepositoryStub() CustomerRepositoryStub {
 	customers := []Customer{
 		{"1", "Krishna", "Gwalior", "474006", "31-08-1994", "single"},
