@@ -35,9 +35,19 @@ func (routerHandler *RouterHandler) getAllCustomer(w http.ResponseWriter, r *htt
 func (routerHandler *RouterHandler) getCustomer(w http.ResponseWriter, r *http.Request) {
 	requestVars := mux.Vars(r)
 	customer_id := requestVars["customer_id"]
-	customer, _ := routerHandler.service.GetCustomerWith(customer_id)
+	customer, err := routerHandler.service.GetCustomerWith(customer_id)
 	w.Header().Add("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(customer)
+	if err != nil {
+		writeResponse(w, err.Code, err.AsMessage())
+	} else {
+		writeResponse(w, http.StatusOK, customer)
+	}
+}
+
+func writeResponse(w http.ResponseWriter, code int, t interface{}) {
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(code)
+	json.NewEncoder(w).Encode(t)
 }
 
 func (routerHandler *RouterHandler) createCustomer(w http.ResponseWriter, r *http.Request) {

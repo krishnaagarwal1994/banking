@@ -28,7 +28,7 @@ func registerHandlers() {
 	router.HandleFunc("/customers", routerHandler.getAllCustomer).Methods(http.MethodGet)
 
 	//Registering an endpoint to return customer based on customer id
-	router.HandleFunc("/customers/{customer_id}", routerHandler.getCustomer) //by default the http method type would be GET here
+	router.HandleFunc("/customers/{customer_id:[0-9]+}", routerHandler.getCustomer) //by default the http method type would be GET here
 
 	router.HandleFunc("/customers", routerHandler.createCustomer).Methods(http.MethodPost)
 	//Here we are starting the servers

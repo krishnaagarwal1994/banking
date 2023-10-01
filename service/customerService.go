@@ -1,11 +1,14 @@
 package service
 
-import "banking/domain"
+import (
+	"banking/domain"
+	"banking/errs"
+)
 
 // This is the primary port of our hexagonal architecture.
 type CustomerService interface {
 	GetAllCustomers() ([]domain.Customer, error)
-	GetCustomerWith(customerID string) (*domain.Customer, error)
+	GetCustomerWith(customerID string) (*domain.Customer, *errs.AppError)
 }
 
 // Adapter for the primary port
@@ -17,7 +20,7 @@ func (s DefaultCustomerService) GetAllCustomers() ([]domain.Customer, error) {
 	return s.repo.FindAll()
 }
 
-func (s DefaultCustomerService) GetCustomerWith(customerID string) (*domain.Customer, error) {
+func (s DefaultCustomerService) GetCustomerWith(customerID string) (*domain.Customer, *errs.AppError) {
 	return s.repo.Find(customerID)
 }
 
