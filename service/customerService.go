@@ -9,7 +9,7 @@ import (
 
 // This is the primary port of our hexagonal architecture.
 type CustomerService interface {
-	GetAllCustomers() ([]domain.Customer, error)
+	GetAllCustomers() ([]dto.CustomerResponse, error)
 	GetCustomerWith(customerID string) (*dto.CustomerResponse, *errs.AppError)
 }
 
@@ -18,8 +18,18 @@ type DefaultCustomerService struct {
 	repo domain.CustomerRepository
 }
 
-func (s DefaultCustomerService) GetAllCustomers() ([]domain.Customer, error) {
-	return s.repo.FindAll()
+func (s DefaultCustomerService) GetAllCustomers() ([]dto.CustomerResponse, error) {
+	customers, err := s.repo.FindAll()
+	if err != nil {
+		logger.Error("Error found")
+		return nil, err
+	}
+	customerResponses := make([]dto.CustomerResponse, 0)
+	for i := 0; i < len(customers); i++ {
+		customerResponse := customers[i].ToDTO()
+		customerResponses = append(customerResponses, customerResponse)
+	}
+	return customerResponses, nil
 }
 
 func (s DefaultCustomerService) GetCustomerWith(customerID string) (*dto.CustomerResponse, *errs.AppError) {
