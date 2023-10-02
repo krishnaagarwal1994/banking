@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"banking/service"
@@ -47,7 +47,10 @@ func (routerHandler *RouterHandler) getCustomer(w http.ResponseWriter, r *http.R
 func writeResponse(w http.ResponseWriter, code int, t interface{}) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(t)
+	err := json.NewEncoder(w).Encode(t)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (routerHandler *RouterHandler) createCustomer(w http.ResponseWriter, r *http.Request) {

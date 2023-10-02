@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"banking/domain"
@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func registerHandlers() {
+func Start() {
 	router := mux.NewRouter()
 
 	// This is the stubbed repository which would give hard coded response
