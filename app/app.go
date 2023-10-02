@@ -3,13 +3,23 @@ package app
 import (
 	"banking/domain"
 	"banking/service"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 )
 
+func envSanityCheck() {
+	if os.Getenv("SERVER_ADDRESS") == "" || os.Getenv("SERVER_PORT") == "" {
+		log.Fatal("Environment variables are not defined")
+	}
+}
+
 func Start() {
+
+	envSanityCheck()
 	router := mux.NewRouter()
 
 	// This is the stubbed repository which would give hard coded response
@@ -32,5 +42,8 @@ func Start() {
 
 	router.HandleFunc("/customers", routerHandler.createCustomer).Methods(http.MethodPost)
 	//Here we are starting the servers
-	log.Fatal(http.ListenAndServe("localhost:8080", router))
+
+	server_address := os.Getenv("SERVER_ADDRESS")
+	server_port := os.Getenv("SERVER_PORT")
+	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%s", server_address, server_port), router))
 }
