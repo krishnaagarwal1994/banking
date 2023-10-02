@@ -2,8 +2,8 @@ package domain
 
 import (
 	"banking/errs"
+	"banking/logger"
 	"database/sql"
-	"log"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -20,7 +20,7 @@ func (repository CustomerRepositoryDb) FindAll() ([]Customer, error) {
 	allCustomers := "select customer_id, name, city, zipcode, date_of_birth, status from customers"
 	rows, error := repository.client.Query(allCustomers)
 	if error != nil {
-		log.Print("Error while querying the customers from the DB")
+		logger.Error("Error while querying the customers from the DB")
 		return nil, error
 	}
 
@@ -28,7 +28,7 @@ func (repository CustomerRepositoryDb) FindAll() ([]Customer, error) {
 		var c Customer
 		error := rows.Scan(&c.Id, &c.Name, &c.City, &c.Zipcode, &c.DateOfBirth, &c.Status)
 		if error != nil {
-			log.Print("Error while scanning the customer rows")
+			logger.Error("Error while scanning the customer rows")
 			return nil, error
 		}
 		customers = append(customers, c)
@@ -48,10 +48,10 @@ func (repository CustomerRepositoryDb) Find(customerID string) (*Customer, *errs
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			log.Print("Customer not found")
+			logger.Debug("Customer not found")
 			return nil, errs.NewNotFoundError("Customer not found")
 		} else {
-			log.Print("Error occured while scanning the customer id " + customerID)
+			logger.Error("Error occured while scanning the customer id " + customerID)
 			return nil, errs.NewServerError("Unexpected database error")
 		}
 	}
