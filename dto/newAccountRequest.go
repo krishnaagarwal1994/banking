@@ -1,6 +1,9 @@
 package dto
 
-import "banking/errs"
+import (
+	"banking/errs"
+	"strings"
+)
 
 type NewAccountRequest struct {
 	AccountType string  `json:"account_type"`
@@ -9,7 +12,7 @@ type NewAccountRequest struct {
 }
 
 func (requestDTO NewAccountRequest) Validate() *errs.AppError {
-	if requestDTO.AccountType != "savings" && requestDTO.AccountType != "checking" {
+	if strings.ToLower(requestDTO.AccountType) != "savings" && strings.ToLower(requestDTO.AccountType) != "checking" {
 		return errs.NewUnexpectedError("account should be either savings or checking")
 	}
 	if requestDTO.Amount < 5000 {
