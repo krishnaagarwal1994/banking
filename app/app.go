@@ -32,15 +32,12 @@ func Start() {
 
 	customerRepositoryDb := domain.NewCustomerRepositoryDb(sqlClient)
 	accountRepositoryDB := domain.NewAccountRepositoryDB(sqlClient)
-	transactionRepositoryDB := domain.NewTransactionRepository(sqlClient)
 
 	customerService := service.NewCustomerService(customerRepositoryDb)
 	accountService := service.NewAccountService(accountRepositoryDB)
-	transactionService := service.NewDefaultTransactionService(transactionRepositoryDB)
 
 	customerHandler := RouterHandler{service: customerService}
 	accountHandler := AccountHandler{accountService: accountService}
-	transactionHandler := TransactionHandler{transactionService: transactionService}
 
 	router.HandleFunc("/greet", greet)
 
@@ -54,7 +51,7 @@ func Start() {
 	router.HandleFunc("/customers/{customer_id:[0-9]+}/account", accountHandler.createNewAccount).Methods(http.MethodPost)
 
 	//Registering an endpoint to create a new bank account for the account id passed in the request payload.
-	router.HandleFunc("/customers/transaction", transactionHandler.NewTransaction).Methods(http.MethodPost)
+	router.HandleFunc("/customers/{customer_id:[0-9]+}/account/{account_id:[0-9]+}", accountHandler.NewTransaction).Methods(http.MethodPost)
 
 	//Here we are starting the servers
 	server_address := os.Getenv("SERVER_ADDRESS")

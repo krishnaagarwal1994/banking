@@ -32,6 +32,27 @@ func (handler AccountHandler) createNewAccount(w http.ResponseWriter, r *http.Re
 	}
 }
 
+func (handler AccountHandler) NewTransaction(w http.ResponseWriter, r *http.Request) {
+	requestVars := mux.Vars(r)
+	accountID := requestVars["account_id"]
+	customerID := requestVars["customer_id"]
+	var transactionRequestDTO dto.TransactionRequest
+	//Mapping the request body to TransactionRequestDTO
+	err := json.NewDecoder(r.Body).Decode(&transactionRequestDTO)
+	if err != nil {
+		logger.Error("Unable to map the request body to TransactionResponseDTO")
+		writeResponse(w, http.StatusBadRequest, err.Error())
+	}
+	transactionRequestDTO.CustomerID = customerID
+	transactionRequestDTO.AccountID = accountID
+	transactionResponse, error := handler.accountService.NewTransaction(transactionRequestDTO)
+	if error != nil {
+		writeResponse(w, error.Code, error.AsMessage())
+	} else {
+		writeResponse(w, http.StatusCreated, transactionResponse)
+	}
+}
+
 func getCustomerIDFromRequest(r *http.Request) string {
 	requestParams := mux.Vars(r)
 	print(requestParams)

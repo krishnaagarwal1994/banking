@@ -6,9 +6,11 @@ import (
 )
 
 type TransactionRequest struct {
-	AccountID       int64   `json:"account_id"`
+	AccountID       string  `json:"account_id"`
 	Amount          float64 `json:"amount"`
 	TransactionType string  `json:"transaction_type"`
+	TransactionDate string  `json:"transaction_date"`
+	CustomerID      string  `json:"-"`
 }
 
 func (t TransactionRequest) Validate() *errs.AppError {
@@ -20,4 +22,12 @@ func (t TransactionRequest) Validate() *errs.AppError {
 		return errs.NewUnexpectedError("Amount value can't be less than zero")
 	}
 	return nil
+}
+
+func (t TransactionRequest) IsTransactionTypeWithdrawal() bool {
+	if strings.ToLower(t.TransactionType) == "withdrawal" {
+		return true
+	} else {
+		return false
+	}
 }

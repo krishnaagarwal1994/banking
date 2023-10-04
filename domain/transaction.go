@@ -1,10 +1,13 @@
 package domain
 
-import "banking/dto"
+import (
+	"banking/dto"
+	"strings"
+)
 
 type Transaction struct {
 	TransactionID   string
-	AccountID       int64
+	AccountID       string
 	Amount          float64
 	TransactionType string
 	TransactionDate string
@@ -12,6 +15,14 @@ type Transaction struct {
 
 func (t Transaction) ToTransactionResponseDTO() dto.TransactionResponse {
 	return dto.TransactionResponse{
-		TransactionID: t.TransactionID,
+		UpdatedBalance:  t.Amount,
+		TransactionID:   t.TransactionID,
+		TransactionType: t.TransactionType,
+		TransactionDate: t.TransactionDate,
+		AccountID:       t.AccountID,
 	}
+}
+
+func (t Transaction) IsWithdrawal() bool {
+	return strings.ToLower(t.TransactionType) == "withdrawal"
 }
