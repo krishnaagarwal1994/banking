@@ -4,7 +4,6 @@ import (
 	"banking/errs"
 	"banking/logger"
 	"database/sql"
-	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -58,15 +57,6 @@ func (repository CustomerRepositoryDb) Find(customerID string) (*Customer, *errs
 	return &c, nil
 }
 
-func NewCustomerRepositoryDb() CustomerRepositoryDb {
-	db, err := sql.Open("mysql", "root:Gn1d0c@123@/banking")
-	if err != nil {
-		panic(err)
-	}
-	// See "Important settings" section.
-	db.SetConnMaxLifetime(time.Minute * 3)
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(10)
-
-	return CustomerRepositoryDb{client: db}
+func NewCustomerRepositoryDb(client *sql.DB) CustomerRepositoryDb {
+	return CustomerRepositoryDb{client: client}
 }

@@ -52,17 +52,3 @@ func writeResponse(w http.ResponseWriter, code int, t interface{}) {
 		panic(err)
 	}
 }
-
-func (routerHandler *RouterHandler) createCustomer(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Post request received")
-	//Sample business logic to decode the request payload
-	// func test(rw http.ResponseWriter, req *http.Request) {
-	// 	decoder := json.NewDecoder(req.Body)
-	// 	var t test_struct
-	// 	err := decoder.Decode(&t)
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	// 	log.Println(t.Test)
-	// }
-}

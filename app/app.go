@@ -3,10 +3,12 @@ package app
 import (
 	"banking/domain"
 	"banking/service"
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -26,24 +28,42 @@ func Start() {
 	// customerRepositoryStub := domain.NewCustomerRepositoryStub()
 
 	// This is the Actual Adapter and would return the data from the DB
-	customerRepositoryDb := domain.NewCustomerRepositoryDb()
+	sqlClient := getSQLClient()
+
+	customerRepositoryDb := domain.NewCustomerRepositoryDb(sqlClient)
+	accountRepositoryDB := domain.NewAccountRepositoryDB(sqlClient)
 
 	customerService := service.NewCustomerService(customerRepositoryDb)
+	accountService := service.NewAccountService(accountRepositoryDB)
 
-	routerHandler := RouterHandler{service: customerService}
+	customerHandler := RouterHandler{service: customerService}
+	accountHandler := AccountHandler{accountService: accountService}
 
 	router.HandleFunc("/greet", greet)
 
 	//Registering an enpoint to fetch all customers
-	router.HandleFunc("/customers", routerHandler.getAllCustomer).Methods(http.MethodGet)
+	router.HandleFunc("/customers", customerHandler.getAllCustomer).Methods(http.MethodGet)
 
 	//Registering an endpoint to return customer based on customer id
-	router.HandleFunc("/customers/{customer_id:[0-9]+}", routerHandler.getCustomer) //by default the http method type would be GET here
+	router.HandleFunc("/customers/{customer_id:[0-9]+}", customerHandler.getCustomer) //by default the http method type would be GET here
 
-	router.HandleFunc("/customers", routerHandler.createCustomer).Methods(http.MethodPost)
+	//Registering an endpoint to create a new bank account for the given customer
+	router.HandleFunc("/customers/{customer_id:[0-9]+}/account", accountHandler.createNewAccount).Methods(http.MethodPost)
+
 	//Here we are starting the servers
-
 	server_address := os.Getenv("SERVER_ADDRESS")
 	server_port := os.Getenv("SERVER_PORT")
 	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%s", server_address, server_port), router))
+}
+
+func getSQLClient() *sql.DB {
+	db, err := sql.Open("mysql", "root:Gn1d0c@123@/banking")
+	if err != nil {
+		panic(err)
+	}
+	// See "Important settings" section.
+	db.SetConnMaxLifetime(time.Minute * 3)
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(10)
+	return db
 }
