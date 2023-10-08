@@ -42,16 +42,25 @@ func Start() {
 	router.HandleFunc("/greet", greet)
 
 	//Registering an enpoint to fetch all customers
-	router.HandleFunc("/customers", customerHandler.getAllCustomer).Methods(http.MethodGet)
+	router.HandleFunc("/customers", customerHandler.getAllCustomer).Methods(http.MethodGet).
+		Name("GetAllCustomers")
 
 	//Registering an endpoint to return customer based on customer id
-	router.HandleFunc("/customers/{customer_id:[0-9]+}", customerHandler.getCustomer) //by default the http method type would be GET here
+	router.HandleFunc("/customers/{customer_id:[0-9]+}", customerHandler.getCustomer).
+		Name("GetCustomer") //by default the http method type would be GET here
 
 	//Registering an endpoint to create a new bank account for the given customer
-	router.HandleFunc("/customers/{customer_id:[0-9]+}/account", accountHandler.createNewAccount).Methods(http.MethodPost)
+	router.HandleFunc("/customers/{customer_id:[0-9]+}/account", accountHandler.createNewAccount).
+		Methods(http.MethodPost).Name("NewAccount")
 
 	//Registering an endpoint to create a new bank account for the account id passed in the request payload.
-	router.HandleFunc("/customers/{customer_id:[0-9]+}/account/{account_id:[0-9]+}", accountHandler.NewTransaction).Methods(http.MethodPost)
+	router.HandleFunc("/customers/{customer_id:[0-9]+}/account/{account_id:[0-9]+}", accountHandler.NewTransaction).
+		Methods(http.MethodPost).Name("NewTransaction")
+
+	//Injecting the middleware for performing the authorisation validation
+	authRepository := domain.NewAuthRepository()
+	authMiddleware := AuthMiddleware{repository: authRepository}
+	router.Use(authMiddleware.authorizationHandler())
 
 	//Here we are starting the servers
 	server_address := os.Getenv("SERVER_ADDRESS")
