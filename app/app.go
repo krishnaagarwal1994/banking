@@ -5,23 +5,49 @@ import (
 	"banking/service"
 	"database/sql"
 	"fmt"
+	"github.com/spf13/viper"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/gorilla/mux"
 )
 
-func envSanityCheck() {
-	if os.Getenv("SERVER_ADDRESS") == "" || os.Getenv("SERVER_PORT") == "" {
-		log.Fatal("Environment variables are not defined")
+var vp *viper.Viper = viper.New()
+
+type Config struct {
+	ServerAddress string `mapstructure:"SERVER_ADDRESS"`
+	ServerPort    string `mapstructure:"SERVER_PORT"`
+}
+
+func loadConfiguration() (Config, error) {
+	vp.SetConfigName("configs")
+	vp.AddConfigPath(".")
+	vp.SetConfigType("env")
+
+	err := vp.ReadInConfig()
+	if err != nil {
+		fmt.Printf("Fatal error config file: %s \n", err)
+		return Config{}, err
 	}
+	var config Config
+	err = vp.Unmarshal(&config)
+	if err != nil {
+		fmt.Printf("Fatal error config file: %s \n", err)
+		return Config{}, err
+	}
+	return config, nil
 }
 
 func Start() {
 
-	envSanityCheck()
+	config, err := loadConfiguration()
+
+	if err != nil {
+		fmt.Printf("Fatal error config file: %s \n", err)
+		panic(err)
+	}
+
 	router := mux.NewRouter()
 
 	// This is the stubbed repository which would give hard coded response
@@ -63,9 +89,7 @@ func Start() {
 	router.Use(authMiddleware.authorizationHandler())
 
 	//Here we are starting the servers
-	server_address := os.Getenv("SERVER_ADDRESS")
-	server_port := os.Getenv("SERVER_PORT")
-	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%s", server_address, server_port), router))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%s", config.ServerAddress, config.ServerPort), router))
 }
 
 func getSQLClient() *sql.DB {
